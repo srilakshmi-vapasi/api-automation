@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="TestNG Packages Spree Test Suite" >
+    <parameter name="browser" value="firefox" />
+    <!--<parameter name="browser" value="firefox,chrome" />-->
+    <test name="Spree API Tests" verbose="2">
+        <classes>
+            <class name="com.thoughtworks.spree.api.test.SpreeAPITestCollection" />
+        </classes>
+    </test>
+</suite>

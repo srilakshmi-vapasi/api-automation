@@ -1,10 +1,12 @@
 package com.thoughtworks.spree.api.test;
 
+import com.thoughtworks.spree.api.test.dataproviders.ProductIdsList;
 import io.restassured.response.Response;
+import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import java.lang.String;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -99,14 +101,21 @@ public class SpreeAPITestCollection {
         Assert.assertEquals("cart", resp.jsonPath().getMap("data").get("type"));
 
     }
+    /*
+    Add products to the cart
+    Read productId, product count from ProductIdsList data provider class
+    Pass the parameters to this method and send in the post request
+     */
+    @Test(dataProvider = "ProductIdsList", dataProviderClass = ProductIdsList.class)
+    public void addItemToCart(int variant, int qty) {
+        System.out.println("variant id :"+variant+"  quantity ::"+qty);
 
-    @Test
-    public void addItemToCart() {
-        String createBody = "{\n" +
-                "  \"variant_id\": \"2\",\n" +
-                "  \"quantity\": 4\n" +
-                "}";
-        Response resp = given().headers(headersList).body(createBody)
+        JSONObject requestParams = new JSONObject();
+        requestParams.put("variant_id", variant);
+        requestParams.put("quantity", qty);
+
+
+        Response resp = given().log().all().headers(headersList).body(requestParams.toString())
                 .when()
                 .post("https://spree-vapasi-prod.herokuapp.com/api/v2/storefront/cart/add_item");
         Assert.assertEquals(resp.statusCode(),200);
@@ -156,8 +165,8 @@ public class SpreeAPITestCollection {
 
     }
 
-    @Test(dependsOnMethods = "getCart")
-    public void emptyCart() {
+    @Test(dependsOnMethods = {"getCart","testRemoveLineItemFromCart"})
+    public void testEmptyCart() {
         if(lineItemIds.size()>0){
             Response res = given().log().all().headers(headersList)
                     .patch("https://spree-vapasi-prod.herokuapp.com/api/v2/storefront/cart/empty");
